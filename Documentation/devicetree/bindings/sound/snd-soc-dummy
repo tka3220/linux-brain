@@ -1,0 +1,13 @@
+snd-soc-dummy:
+
+ALSA SoC dummy codec.
+
+Required properties:
+
+  - compatible : "alsa-soc-dummy"
+
+Example:
+
+sound_dummy {
+	compatible = "alsa-soc-dummy";
+};

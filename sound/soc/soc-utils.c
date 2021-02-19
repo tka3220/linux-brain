@@ -7,6 +7,8 @@
 // Author: Mark Brown <broonie@opensource.wolfsonmicro.com>
 //         Liam Girdwood <lrg@slimlogic.co.uk>
 
+#include <linux/module.h>
+#include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/export.h>
 #include <sound/core.h>
@@ -112,14 +114,12 @@ static const struct snd_soc_component_driver dummy_codec = {
 static struct snd_soc_dai_driver dummy_dai = {
 	.name = "snd-soc-dummy-dai",
 	.playback = {
-		.stream_name	= "Playback",
 		.channels_min	= 1,
 		.channels_max	= 384,
 		.rates		= STUB_RATES,
 		.formats	= STUB_FORMATS,
 	},
 	.capture = {
-		.stream_name	= "Capture",
 		.channels_min	= 1,
 		.channels_max	= 384,
 		.rates = STUB_RATES,
@@ -149,9 +149,15 @@ static int snd_soc_dummy_probe(struct platform_device *pdev)
 	return ret;
 }
 
+static struct of_device_id soc_dummy_of_match[] = {
+	{ .compatible = "alsa-soc-dummy" },
+	{},
+};
+
 static struct platform_driver soc_dummy_driver = {
 	.driver = {
 		.name = "snd-soc-dummy",
+		.of_match_table = soc_dummy_of_match,
 	},
 	.probe = snd_soc_dummy_probe,
 };
