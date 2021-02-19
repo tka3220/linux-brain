@@ -103,6 +103,7 @@
 					reg = <0>;
 					fsl,pinmux-ids = <
 						MX28_PAD_GPMI_CLE__GPIO_0_27
+						MX28_PAD_GPMI_RESETN__GPIO_0_28
 					>;
 					fsl,drive-strength = <MXS_DRIVE_4mA>;
 					fsl,voltage = <MXS_VOLTAGE_HIGH>;
@@ -175,6 +176,10 @@
 					fsl,voltage = <MXS_VOLTAGE_LOW>;
 					fsl,pull-up = <MXS_PULL_DISABLE>;
 				};
+
+				saif0_pins_a: saif0@0 {
+					// fsl,voltage = <MXS_VOLTAGE_LOW>;
+				};
 			};
 
 			brainlcd: lcdif@80030000 {
@@ -211,15 +216,6 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&i2c0_pins_a>;
 				status = "okay";
-
-				sgtl5000: codec@a {
-					compatible = "fsl,sgtl5000";
-					reg = <0x0a>;
-					#sound-dai-cells = <0>;
-					VDDA-supply = <&reg_3p3v>;
-					VDDIO-supply = <&reg_3p3v>;
-					clocks = <&saif0>;
-				};
 			};
 
 			i2c1: i2c@8005a000 {
@@ -269,11 +265,27 @@
 	};
 
 	sound {
-		compatible = "fsl,imx28-evk-sgtl5000",
-			     "fsl,mxs-audio-sgtl5000";
-		model = "imx28-evk-sgtl5000";
-		saif-controllers = <&saif0 &saif1>;
-		audio-codec = <&sgtl5000>;
+		compatible = "simple-audio-card";
+		status = "okay";
+		simple-audio-card,name = "brain-audio";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&dai>;
+		simple-audio-card,bitclock-master = <&dai>;
+		simple-audio-card,mclk-fs = <128>; /* need to measure */
+
+		dai: simple-audio-card,cpu {
+			sound-dai = <&saif0>;
+		};
+
+		codec: simple-audio-card,codec {
+			sound-dai = <&dummy_codec>;
+		};
+	};
+
+	dummy_codec: dummy_codec {
+		#sound-dai-cells = <0>;
+		compatible = "alsa-soc-dummy";
+		status = "okay";
 	};
 
 	backlight_display: backlight {
